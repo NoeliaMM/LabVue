@@ -1,7 +1,11 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Task } from '../types'
-import { addTaskToDb, deleteTaskDb, loadTasksFromBd,updateTaskCompletedDb } from '@/services/tasksServices';
+
+//Comentar o descomentar segun el servicio que se queira usar indexDb o fireabase
+// Para usar firebase configurar el firebase.ts y el .env
+  // import {taskService } from '@/services/firebase/tasksServices';
+ import {taskService} from '@/services/indexDb/tasksService';
 
 const taskFactory = (value: string): Omit<Task,'id'> => ({
   timestamp: Date.now(),
@@ -13,38 +17,40 @@ export const useTasksStore = defineStore('tasksStore', () => {
   const tasks = ref<Task[]>([])
 
   const loadTaskToVm = async () => {
-    tasks.value = await loadTasksFromBd();;
+    tasks.value = (await taskService.loadTasksFromBd()) as Task[];
   };
 
   const addTask = async (task: string) => {
     const taskData = taskFactory(task);
-    const newTaskId = await addTaskToDb(taskData);
-    tasks.value.push({id:newTaskId,...taskData});
+    const newTask = await taskService.addTaskToDb(taskData) as Task;
+    tasks.value.push({ ...newTask});
   }
 
   const toggleCompleted = async (id: string) => {
     const task = tasks.value.find((item) => item.id === id)
     if (task) {
+      const updatedCompleted = !task.completed;
+      await taskService.updateTaskCompletedDb({ ...task, completed: updatedCompleted });
 
-        await updateTaskCompletedDb(id,!task.completed);
-
-         const index = findIndexTask(tasks.value,id)
-        if (index !== -1) {
-          tasks.value[index] = { ...task, completed: !task.completed }; 
-        }
+      const index = findIndexTask(tasks.value, id);
+      if (index !== -1) {
+        tasks.value[index] = { ...task, completed: updatedCompleted };
+      }
     }
   }
 
-  const removeTask = async (id: string)=>{
+  const removeTask = async (id:string)=>{
+
     const index= findIndexTask(tasks.value,id)
     if(index !== -1){
-      await deleteTaskDb(id);
+      await taskService.deleteTaskDb(id);
       tasks.value.splice(index,1);
     }
   }
+
   return { tasks, addTask, toggleCompleted, removeTask, loadTaskToVm }
 })
 
 const findIndexTask =(tasks:Task[], id:string) =>{
-  return tasks.findIndex((item) => item.id === id);
+  return tasks.findIndex((task => task.id === id));
 }

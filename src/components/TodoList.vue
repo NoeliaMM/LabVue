@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useTasksStore } from '@/stores/tasksStore'
+import type { Task } from '@/types';
 import { onMounted } from 'vue';
 
 const tasksStore = useTasksStore();
@@ -12,7 +13,7 @@ const completeTask = (id: string) => {
   tasksStore.toggleCompleted(id)
 }
 
-const removeTask = (id: string) => {
+const removeTask = (id:string) => {
 
   tasksStore.removeTask(id)
 }

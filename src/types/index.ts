@@ -1,5 +1,5 @@
 export type Task = {
-id:string,
+id:string | number,
 timestamp:number,
 text:string,
 completed:boolean
