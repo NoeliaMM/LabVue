@@ -43,3 +43,15 @@ npm run test:unit
 ```sh
 npm run lint
 ```
+
+
+### Persistencia de datos 
+
+ IndexedDB – Local Storage
+
+Firebase
+
+If you want to use Firebase, import services/firebase in taskStorage and configure the .env file with the connection variables.
+
+
+ 

@@ -2,7 +2,7 @@ const DB_NAME = 'todoDB';
 const STORE_NAME = 'tasks';
 const DB_VERSION = 1;
 
-import type { Task } from "../../types";
+import type { Task, TaskId } from "@/types";
 
 const openDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
@@ -52,7 +52,7 @@ export const taskService = {
     });
   },
 
-  async deleteTaskDb(id:string) {
+  async deleteTaskDb(id:TaskId) {
     const db = await openDB();
     return new Promise((resolve) => {
       const transaction = db.transaction(STORE_NAME, 'readwrite');

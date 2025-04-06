@@ -1,11 +1,9 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Task } from '../types'
+import type { Task, TaskId, TaskState } from '../types'
 
-//Comentar o descomentar segun el servicio que se queira usar indexDb o fireabase
-// Para usar firebase configurar el firebase.ts y el .env
-  // import {taskService } from '@/services/firebase/tasksServices';
- import {taskService} from '@/services/indexDb/tasksService';
+//  import {taskService } from '@/services/firebase/tasksServices';
+import {taskService} from '@/services/indexDb/tasksService';
 
 const taskFactory = (value: string): Omit<Task,'id'> => ({
   timestamp: Date.now(),
@@ -15,6 +13,8 @@ const taskFactory = (value: string): Omit<Task,'id'> => ({
 
 export const useTasksStore = defineStore('tasksStore', () => {
   const tasks = ref<Task[]>([])
+
+  const filter = ref<'all' | 'completed' | 'pending'>('pending')
 
   const loadTaskToVm = async () => {
     tasks.value = (await taskService.loadTasksFromBd()) as Task[];
@@ -26,7 +26,7 @@ export const useTasksStore = defineStore('tasksStore', () => {
     tasks.value.push({ ...newTask});
   }
 
-  const toggleCompleted = async (id: string) => {
+  const toggleCompleted = async (id: string | number) => {
     const task = tasks.value.find((item) => item.id === id)
     if (task) {
       const updatedCompleted = !task.completed;
@@ -39,7 +39,7 @@ export const useTasksStore = defineStore('tasksStore', () => {
     }
   }
 
-  const removeTask = async (id:string)=>{
+  const removeTask = async (id:TaskId)=>{
 
     const index= findIndexTask(tasks.value,id)
     if(index !== -1){
@@ -48,9 +48,25 @@ export const useTasksStore = defineStore('tasksStore', () => {
     }
   }
 
-  return { tasks, addTask, toggleCompleted, removeTask, loadTaskToVm }
+  const setFilter = (value: TaskState) => {
+      filter.value = value;
+  }
+
+  const filterTasks = computed(() => {
+    switch (filter.value) {
+      case 'completed':
+        return tasks.value.filter(t => t.completed)
+      case 'pending':
+        return tasks.value.filter(t => !t.completed)
+      default:
+        return tasks.value
+    }
+  })
+
+
+  return { tasks,filter, addTask, toggleCompleted, removeTask, loadTaskToVm,setFilter,filterTasks }
 })
 
-const findIndexTask =(tasks:Task[], id:string) =>{
+const findIndexTask =(tasks:Task[], id:TaskId) =>{
   return tasks.findIndex((task => task.id === id));
 }
