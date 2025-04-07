@@ -63,8 +63,17 @@ export const useTasksStore = defineStore('tasksStore', () => {
     }
   })
 
+  const sortedTasks = computed(() =>
+    [...filterTasks.value].sort((a, b) => {
+      if (typeof a.id === 'number' && typeof b.id === 'number') {
+        return b.id - a.id
+      }
+      return String(b.id).localeCompare(String(a.id))
+    })
+  )
 
-  return { tasks,filter, addTask, toggleCompleted, removeTask, loadTaskToVm,setFilter,filterTasks }
+
+  return { tasks,filter, addTask, toggleCompleted, removeTask, loadTaskToVm,setFilter,filterTasks,sortedTasks }
 })
 
 const findIndexTask =(tasks:Task[], id:TaskId) =>{

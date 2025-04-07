@@ -15,6 +15,8 @@ const addTask = () => {
   }
   tasksStore.addTask(taskInput.value)
   taskInput.value = ''
+  tasksStore.filter= 'pending'
+
 }
 
 import { useTasksStore } from '@/stores/tasksStore'
@@ -31,9 +33,9 @@ import { useTasksStore } from '@/stores/tasksStore'
         aria-label="Add a task"
         @keyup.enter="addTask"
         @keyup.esc="taskInput = ''"
-        @blur="taskInput = ''"
       />
       <div
+
         class="bg-emerald-500 hover:bg-emerald-700 p-1 rounded flex items-center justify-center cursor-pointer"
         aria-label="Add task"
         title="Add task"
@@ -41,7 +43,12 @@ import { useTasksStore } from '@/stores/tasksStore'
         tabindex="0"
         @click="addTask"
       >
-        <font-awesome-icon :icon="['fas', 'plus']" class="text-white text-lg" />
+        <font-awesome-icon
+
+        :icon="['fas', 'plus']" class="text-white text-lg"
+        role="button"
+            tabindex="0"
+           />
       </div>
     </div>
   </form>

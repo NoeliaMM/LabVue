@@ -36,7 +36,7 @@ const selectInputText = (event: FocusEvent) => {
 
 <template>
   <ul class="divide-y divide-gray-200 px-4 mt-5" role="list">
-    <li class="py-4" v-for="task in tasksStore.filterTasks" :key="task.id">
+    <li class="py-4" v-for="task in tasksStore.sortedTasks" :key="task.id">
       <form @submit.prevent>
         <div class="flex items-center justify-between">
           <font-awesome-icon
